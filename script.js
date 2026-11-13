@@ -1,35 +1,200 @@
 
 const chanceInput = document.getElementById("chance");
-
-const zoomInput = document.getElementById("zoom");
 const zoomNumber = document.getElementById("zoomNumber");
+
+const targetInput = document.getElementById("targetInput");
+const calculateButton = document.getElementById("calculateButton");
+const customResult = document.getElementById("customResult");
+
+const tabelaResultados = document.getElementById("tabelaResultados");
 
 const contexto = document.getElementById("grafico");
 
 
-// Criação do gráfico
+// =====================================
+// CÁLCULO DA PROBABILIDADE ACUMULADA
+// =====================================
+
+function calcularProbabilidade(a, n) {
+
+    if (n <= 0) return 0;
+
+    if (a <= 0) return 0;
+
+    if (a >= 1) return 100;
+
+    return -Math.expm1(n * Math.log1p(-a)) * 100;
+
+}
+
+
+// =====================================
+// CÁLCULO DO NÚMERO DE GIROS
+// =====================================
+
+function calcularTentativas(a, alvo) {
+
+    if (alvo <= 0) {
+        return 0;
+    }
+
+    if (a <= 0) {
+        return Infinity;
+    }
+
+    if (a >= 1) {
+        return 1;
+    }
+
+    if (alvo >= 100) {
+        return Infinity;
+    }
+
+    const resultado =
+        Math.log1p(-alvo / 100) /
+        Math.log1p(-a);
+
+    return Math.ceil(resultado - 1e-12);
+
+}
+
+
+// =====================================
+// FORMATAÇÃO DOS RESULTADOS
+// =====================================
+
+function formatarTentativas(valor) {
+
+    if (!Number.isFinite(valor)) {
+        return "∞";
+    }
+
+    return valor.toLocaleString("pt-BR");
+
+}
+
+
+// =====================================
+// CRIAÇÃO DA TABELA
+// =====================================
+
+function atualizarTabela(a) {
+
+    tabelaResultados.innerHTML = "";
+
+    for (let alvo = 50; alvo <= 100; alvo += 5) {
+
+        const tentativas = calcularTentativas(a, alvo);
+
+        const linha = document.createElement("tr");
+
+        const colunaAlvo = document.createElement("td");
+        const colunaTentativas = document.createElement("td");
+
+        colunaAlvo.className = "target-percent";
+        colunaTentativas.className = "target-spins";
+
+        colunaAlvo.textContent = alvo + "%";
+
+        colunaTentativas.textContent =
+            formatarTentativas(tentativas);
+
+        linha.appendChild(colunaAlvo);
+        linha.appendChild(colunaTentativas);
+
+        tabelaResultados.appendChild(linha);
+
+    }
+
+}
+
+
+// =====================================
+// CALCULADORA PERSONALIZADA
+// =====================================
+
+function calcularPersonalizado() {
+
+    const porcentagem = targetInput.value;
+
+    customResult.classList.remove("error");
+
+    if (porcentagem.trim() === "") {
+
+        customResult.textContent =
+            "Digite uma porcentagem primeiro.";
+
+        customResult.classList.add("error");
+        return;
+
+    }
+
+    const alvo = Number(porcentagem);
+
+    if (
+        !Number.isFinite(alvo) ||
+        alvo < 0 ||
+        alvo > 100
+    ) {
+
+        customResult.textContent =
+            "Digite um valor entre 0 e 100%.";
+
+        customResult.classList.add("error");
+        return;
+
+    }
+
+    const a = Number(chanceInput.value) / 100;
+
+    const resultado = calcularTentativas(a, alvo);
+
+    if (!Number.isFinite(resultado)) {
+
+        customResult.innerHTML =
+            "Essa meta não pode ser atingida com uma quantidade finita de giros. <strong>∞</strong>";
+
+        return;
+
+    }
+
+    customResult.innerHTML =
+        "Giros mínimos necessários:" +
+        "<strong>" + formatarTentativas(resultado) + "</strong>" +
+        "Probabilidade desejada: " + alvo + "%";
+
+}
+
+
+// =====================================
+// CRIAÇÃO DO GRÁFICO
+// =====================================
 
 const grafico = new Chart(contexto, {
 
     type: "line",
 
     data: {
+
         labels: [],
 
         datasets: [{
-            label: "Chance acumulada (%)",
+
+            label: "Probabilidade acumulada",
 
             data: [],
 
-            borderColor: "#9b8aff",
-            backgroundColor: "#9b8aff33",
+            borderColor: "#a58bcf",
+            backgroundColor: "rgba(165, 139, 207, 0.15)",
 
             fill: true,
             tension: 0.3,
 
             pointRadius: 0,
             pointHoverRadius: 6
+
         }]
+
     },
 
     options: {
@@ -45,38 +210,52 @@ const grafico = new Chart(contexto, {
         scales: {
 
             y: {
+
                 min: 0,
                 max: 100,
 
                 title: {
                     display: true,
                     text: "Probabilidade (%)",
-                    color: "white"
+                    color: "#8065aa"
                 },
 
                 ticks: {
-                    color: "white"
+                    color: "#8e8199"
+                },
+
+                grid: {
+                    color: "#eee5f5"
                 }
+
             },
 
             x: {
+
                 title: {
                     display: true,
-                    text: "Número de tentativas",
-                    color: "white"
+                    text: "Número de giros",
+                    color: "#8065aa"
                 },
 
                 ticks: {
-                    color: "white"
+                    color: "#8e8199",
+                    maxTicksLimit: 10
+                },
+
+                grid: {
+                    display: false
                 }
+
             }
+
         },
 
         plugins: {
 
             legend: {
                 labels: {
-                    color: "white"
+                    color: "#8065aa"
                 }
             },
 
@@ -85,12 +264,16 @@ const grafico = new Chart(contexto, {
                 callbacks: {
 
                     title: function(items) {
-                        return "Tentativa: " + items[0].label;
+
+                        return "Giro: " + items[0].label;
+
                     },
 
                     label: function(item) {
-                        return "Probabilidade: " +
+
+                        return "Chance acumulada: " +
                             item.parsed.y.toFixed(4) + "%";
+
                     }
 
                 }
@@ -98,78 +281,43 @@ const grafico = new Chart(contexto, {
             }
 
         }
+
     }
+
 });
 
 
-// Calcula a probabilidade acumulada
+// =====================================
+// ATUALIZAÇÃO GERAL
+// =====================================
 
-function calcularProbabilidade(a, n) {
+function atualizarTudo() {
 
-    return (1 - Math.pow(1 - a, n)) * 100;
-
-}
-
-
-// Descobre quantas tentativas são necessárias
-
-function calcularTentativas(a, alvo) {
-
-    if (a <= 0) {
-        return "Impossível";
-    }
-
-    if (a >= 1) {
-        return 1;
-    }
-
-    return Math.ceil(
-        Math.log(1 - alvo) / Math.log(1 - a)
-    );
-
-}
-
-
-// Atualiza os resultados de probabilidade-alvo
-
-function atualizarAlvos(a) {
-
-    const alvos = [50, 90, 95, 99];
-
-    alvos.forEach(function(alvo) {
-
-        const resultado = calcularTentativas(a, alvo);
-
-        document.getElementById("target" + alvo)
-            .textContent = resultado;
-
-    });
-
-}
-
-
-// Atualiza o gráfico inteiro
-
-function atualizarGrafico() {
-
-    let porcentagem = Number(chanceInput.value);
-
-    if (!Number.isFinite(porcentagem)) {
-        return;
-    }
-
-    porcentagem = Math.min(100, Math.max(0, porcentagem));
-
-    const a = porcentagem / 100;
-
+    const chance = Number(chanceInput.value);
     const limite = Number(zoomNumber.value);
 
-    if (!Number.isInteger(limite) || limite < 1 || limite > 10000) {
+    if (
+        chanceInput.value.trim() === "" ||
+        !Number.isFinite(chance) ||
+        chance < 0 ||
+        chance > 100
+    ) {
         return;
     }
 
-    let tentativas = [];
-    let probabilidades = [];
+    if (
+        zoomNumber.value.trim() === "" ||
+        !Number.isInteger(limite) ||
+        limite < 1 ||
+        limite > 10000
+    ) {
+        return;
+    }
+
+    const a = chance / 100;
+
+    const tentativas = [];
+    const probabilidades = [];
 
     for (let n = 1; n <= limite; n++) {
 
@@ -187,47 +335,47 @@ function atualizarGrafico() {
 
     grafico.update("none");
 
-    atualizarAlvos(a);
+    atualizarTabela(a);
 
 }
 
 
-// Sincronização entre barra e caixinha
+// =====================================
+// EVENTOS
+// =====================================
 
-zoomInput.addEventListener("input", function() {
+chanceInput.addEventListener("input", function() {
 
-    zoomNumber.value = zoomInput.value;
+    atualizarTudo();
 
-    atualizarGrafico();
+    // Atualiza o resultado personalizado
+    // caso já exista uma meta digitada.
 
-});
-
-
-zoomNumber.addEventListener("input", function() {
-
-    const valor = Number(zoomNumber.value);
-
-    if (
-        Number.isInteger(valor) &&
-        valor >= 1 &&
-        valor <= 10000
-    ) {
-
-        zoomInput.value = Math.min(
-            10000,
-            Math.max(10, Math.ceil(valor / 10) * 10)
-        );
-
-        atualizarGrafico();
-
+    if (targetInput.value.trim() !== "") {
+        calcularPersonalizado();
     }
 
 });
 
 
-chanceInput.addEventListener("input", atualizarGrafico);
+zoomNumber.addEventListener("input", atualizarTudo);
+
+calculateButton.addEventListener(
+    "click",
+    calcularPersonalizado
+);
+
+targetInput.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        calcularPersonalizado();
+    }
+
+});
 
 
-// Inicialização
+// =====================================
+// INICIALIZAÇÃO
+// =====================================
 
-atualizarGrafico();
+atualizarTudo();

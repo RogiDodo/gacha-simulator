@@ -13,10 +13,30 @@ document.addEventListener("DOMContentLoaded", function() {
     const customResult = document.getElementById("customResult");
 
     const tabelaResultados = document.getElementById("tabelaResultados");
-
     const contexto = document.getElementById("grafico");
 
     let grafico = null;
+
+
+    // =================================
+    // MOSTRADOR DE CHANCE ABAIXO DO GRÁFICO
+    // =================================
+
+    const chanceDisplay = document.createElement("div");
+
+    chanceDisplay.style.textAlign = "center";
+    chanceDisplay.style.padding = "14px";
+    chanceDisplay.style.marginTop = "12px";
+    chanceDisplay.style.borderRadius = "14px";
+    chanceDisplay.style.background = "#f8f2ff";
+    chanceDisplay.style.color = "#8065aa";
+    chanceDisplay.style.fontSize = "15px";
+    chanceDisplay.style.lineHeight = "1.7";
+
+    contexto.parentElement.insertAdjacentElement(
+        "afterend",
+        chanceDisplay
+    );
 
 
     // =================================
@@ -271,13 +291,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // ATUALIZAÇÃO GERAL
     // =================================
 
-    function atualizarTudo() {
+    function atualizarTudo(atualizarMeta = false) {
 
         const chanceTexto = chanceInput.value.trim();
-        const limiteTexto = zoomNumber.value.trim();
 
         const chance = Number(chanceTexto);
-        const limite = Number(limiteTexto);
 
         if (
             chanceTexto === "" ||
@@ -285,32 +303,56 @@ document.addEventListener("DOMContentLoaded", function() {
             chance < 0 ||
             chance > 100
         ) {
-            return;
-        }
+            chanceDisplay.textContent =
+                "Insira uma chance válida para visualizar a probabilidade.";
 
-        if (
-            limiteTexto === "" ||
-            !Number.isInteger(limite) ||
-            limite < 1 ||
-            limite > 10000
-        ) {
             return;
         }
 
         const a = chance / 100;
 
-        // A tabela sempre será atualizada.
+        // Calcula automaticamente os giros para atingir 95%.
+
+        if (atualizarMeta) {
+
+            const giros95 = calcularTentativas(a, 95);
+
+            if (Number.isFinite(giros95)) {
+
+                zoomNumber.value = giros95;
+
+            } else {
+
+                zoomNumber.value = "";
+
+            }
+
+        }
+
+        // Atualiza a tabela.
 
         atualizarTabela(a);
 
-        // Atualiza o gráfico, se estiver disponível.
+        // Atualiza o gráfico.
 
-        if (grafico) {
+        const limiteTexto = zoomNumber.value.trim();
+        const limite = Number(limiteTexto);
+
+        if (
+            grafico &&
+            limiteTexto !== "" &&
+            Number.isInteger(limite) &&
+            limite >= 1
+        ) {
 
             const tentativas = [];
             const probabilidades = [];
 
-            for (let n = 1; n <= limite; n++) {
+            // Limite visual para evitar gráficos excessivamente pesados.
+
+            const limiteGrafico = Math.min(limite, 10000);
+
+            for (let n = 1; n <= limiteGrafico; n++) {
 
                 tentativas.push(n);
 
@@ -328,7 +370,40 @@ document.addEventListener("DOMContentLoaded", function() {
 
         }
 
-        // Atualiza também a calculadora personalizada.
+        // Mostra a chance correspondente aos giros estabelecidos.
+
+        if (
+            limiteTexto !== "" &&
+            Number.isInteger(limite) &&
+            limite >= 1
+        ) {
+
+            const probabilidade =
+                calcularProbabilidade(a, limite);
+
+            chanceDisplay.innerHTML =
+                "🎀 Chance acumulada em <strong>" +
+                formatarTentativas(limite) +
+                " giros:</strong><br>" +
+                "<strong style='font-size: 23px;'>" +
+                probabilidade.toFixed(4).replace(".", ",") +
+                "%</strong>";
+
+            if (limite > 10000) {
+
+                chanceDisplay.innerHTML +=
+                    "<br><small>O gráfico exibe os primeiros 10.000 giros.</small>";
+
+            }
+
+        } else {
+
+            chanceDisplay.textContent =
+                "Informe uma quantidade válida de giros.";
+
+        }
+
+        // Atualiza a calculadora personalizada.
 
         if (targetInput.value.trim() !== "") {
             calcularPersonalizado();
@@ -341,9 +416,17 @@ document.addEventListener("DOMContentLoaded", function() {
     // EVENTOS
     // =================================
 
-    chanceInput.addEventListener("input", atualizarTudo);
+    // Mudou a chance? Recalcula automaticamente a meta de 95%.
 
-    zoomNumber.addEventListener("input", atualizarTudo);
+    chanceInput.addEventListener("input", function() {
+        atualizarTudo(true);
+    });
+
+    // Mudou o número de giros? Atualiza gráfico e chance exibida.
+
+    zoomNumber.addEventListener("input", function() {
+        atualizarTudo(false);
+    });
 
     calculateButton.addEventListener(
         "click",
@@ -363,7 +446,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // INICIALIZAÇÃO
     // =================================
 
-    atualizarTudo();
+    atualizarTudo(true);
 
     console.log("Gacha Simulator iniciado com sucesso!");
 

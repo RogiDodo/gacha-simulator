@@ -6,44 +6,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Gacha Simulator</title>
+    <title>Gacha Probability Simulator</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h1>Gacha Probability Simulator</h1>
+    <header>
+        <h1>Gacha Simulator</h1>
+        <p>Calculadora de probabilidades</p>
+    </header>
 
-    <div class="controls">
+    <main>
 
-        <label for="chance">Chance de conseguir (%)</label>
+        <section class="panel">
 
-        <input
-            type="number"
-            id="chance"
-            value="10"
-            min="0"
-            max="100"
-            step="0.1"
-        >
+            <h2>Configurações</h2>
 
-        <label for="zoom">Número de tentativas: <span id="zoomValue">100</span></label>
+            <label for="chance">
+                Chance de conseguir o item (%)
+            </label>
 
-        <input
-            type="range"
-            id="zoom"
-            min="10"
-            max="500"
-            value="100"
-            step="10"
-        >
+            <input
+                type="number"
+                id="chance"
+                value="10"
+                min="0"
+                max="100"
+                step="0.1"
+            >
 
-    </div>
+            <label>
+                Número de tentativas exibidas
+            </label>
 
-    <div class="chart-container">
-        <canvas id="grafico"></canvas>
-    </div>
+            <div class="zoom-controls">
+
+                <input
+                    type="range"
+                    id="zoom"
+                    min="10"
+                    max="10000"
+                    value="100"
+                    step="10"
+                >
+
+                <input
+                    type="number"
+                    id="zoomNumber"
+                    min="1"
+                    max="10000"
+                    value="100"
+                >
+
+            </div>
+
+        </section>
+
+
+        <section class="panel">
+
+            <h2>Gráfico de probabilidade</h2>
+
+            <div class="chart-container">
+                <canvas id="grafico"></canvas>
+            </div>
+
+        </section>
+
+
+        <section class="panel">
+
+            <h2>Probabilidade acumulada</h2>
+
+            <div class="target-grid">
+
+                <div class="target-card">
+                    <h3>50%</h3>
+                    <p id="target50">--</p>
+                    <small>tentativas</small>
+                </div>
+
+                <div class="target-card">
+                    <h3>90%</h3>
+                    <p id="target90">--</p>
+                    <small>tentativas</small>
+                </div>
+
+                <div class="target-card">
+                    <h3>95%</h3>
+                    <p id="target95">--</p>
+                    <small>tentativas</small>
+                </div>
+
+                <div class="target-card">
+                    <h3>99%</h3>
+                    <p id="target99">--</p>
+                    <small>tentativas</small>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        Gacha Probability Simulator
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>

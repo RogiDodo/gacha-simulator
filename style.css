@@ -4,8 +4,35 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
+    padding: 20px;
 }
 
 h1 {
     color: #8b7cff;
+}
+
+.controls {
+    max-width: 500px;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+input[type="range"] {
+    accent-color: #8b7cff;
+}
+
+.chart-container {
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-radius: 12px;
 }

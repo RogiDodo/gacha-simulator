@@ -5,6 +5,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     background: #faf7ff;
     color: #494052;
@@ -123,6 +127,175 @@ input:focus {
     height: 350px;
 }
 
+/* CURRENCY SWITCH */
+
+.currency-toggle-area {
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid #f2e9d0;
+}
+
+.currency-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin: 0;
+    user-select: none;
+}
+
+.currency-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.switch-slider {
+    position: relative;
+    width: 49px;
+    height: 27px;
+    background: #ded9e5;
+    border-radius: 30px;
+    transition: 0.25s;
+}
+
+.switch-slider::before {
+    content: "";
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: 0.25s;
+}
+
+.currency-switch input:checked + .switch-slider {
+    background: #f2c94c;
+}
+
+.currency-switch input:checked + .switch-slider::before {
+    transform: translateX(22px);
+}
+
+.currency-switch input:focus-visible + .switch-slider {
+    outline: 3px solid #f8e8aa;
+    outline-offset: 3px;
+}
+
+.currency-switch-text {
+    color: #b18a19;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.currency-settings {
+    margin-top: 12px;
+    padding: 16px;
+    background: #fffaf0;
+    border: 1px solid #f4e6b8;
+    border-radius: 13px;
+}
+
+.currency-settings label {
+    color: #997817;
+    margin-top: 0;
+}
+
+.currency-settings input {
+    background: #fffdf7;
+    border-color: #eadba7;
+}
+
+.currency-settings input:focus {
+    border-color: #e5bd48;
+    box-shadow: 0 0 0 3px #fff4ce;
+}
+
+.currency-settings .hint {
+    color: #b19a5c;
+}
+
+.currency-error {
+    color: #b65d52;
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+/* ABAS DO GRÁFICO */
+
+.chart-mode-switch {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.chart-mode-button {
+    width: 50%;
+    margin: 0;
+    padding: 12px;
+    background: #f2ebfa;
+    color: #8c73ae;
+    border: 1px solid #e8def3;
+    border-radius: 11px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.chart-mode-button:hover {
+    background: #eae0f6;
+}
+
+.chart-mode-button.active {
+    background: #a58bcf;
+    color: white;
+    border-color: #a58bcf;
+}
+
+.chart-mode-button.currency-mode {
+    background: #fff8df;
+    color: #b08b22;
+    border-color: #f1e2ae;
+}
+
+.chart-mode-button.currency-mode:hover {
+    background: #fff0c2;
+}
+
+.chart-mode-button.currency-mode.active {
+    background: #e9bd43;
+    border-color: #e9bd43;
+    color: #ffffff;
+}
+
+/* PROBABILIDADE ABAIXO DO GRÁFICO */
+
+.chance-display {
+    text-align: center;
+    padding: 15px;
+    margin-top: 14px;
+    border-radius: 14px;
+    background: #f8f2ff;
+    color: #8065aa;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.chance-display strong {
+    font-size: 23px;
+}
+
+.chance-display.currency-display {
+    background: #fff9e8;
+    color: #a27c16;
+}
+
+/* TABELA */
+
 .table-wrapper {
     overflow-x: auto;
     border: 1px solid #eee5f5;
@@ -169,7 +342,14 @@ tbody tr:hover {
     font-weight: 800;
 }
 
-button {
+.target-currency {
+    color: #b08b22;
+    font-weight: 800;
+}
+
+/* CALCULADORA */
+
+button#calculateButton {
     width: 100%;
     margin-top: 18px;
     padding: 14px;
@@ -184,11 +364,11 @@ button {
     transition: background 0.2s;
 }
 
-button:hover {
+button#calculateButton:hover {
     background: #9073bd;
 }
 
-button:active {
+button#calculateButton:active {
     transform: scale(0.99);
 }
 
@@ -208,6 +388,11 @@ button:active {
     font-size: 25px;
     display: block;
     margin-top: 5px;
+}
+
+.result-box .currency-result {
+    color: #b08b22;
+    margin-top: 12px;
 }
 
 .result-box.error {
@@ -248,6 +433,11 @@ footer p {
     th, td {
         font-size: 12px;
         padding: 12px 6px;
+    }
+
+    .chart-mode-button {
+        font-size: 12px;
+        padding: 11px 5px;
     }
 
 }

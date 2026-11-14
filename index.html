@@ -17,7 +17,7 @@
         <div class="brand-icon">✿</div>
         <h1>Calculadora de Probabilidade do RogiCocoSassame</h1>
         <p>Calculadora de probabilidades acumuladas</p>
-        <span class="subtitle">KAWAII SUPREME ECO 1.0 EDITION ♡</span>
+        <span class="subtitle">KAWAII SUPREME ECO 2.0 EDITION ♡</span>
     </header>
 
     <main>
@@ -53,13 +53,55 @@
                 id="zoomNumber"
                 min="1"
                 max="10000"
-                value="100"
+                placeholder="Automático"
                 step="1"
             >
 
             <p class="hint">
                 Insira a quantidade de giros que deseja visualizar.
             </p>
+
+            <!-- CURRENCY -->
+
+            <div class="currency-toggle-area">
+
+                <label class="currency-switch">
+
+                    <input type="checkbox" id="currencyToggle">
+
+                    <span class="switch-slider"></span>
+
+                    <span class="currency-switch-text">
+                        💛 CURRENCY
+                    </span>
+
+                </label>
+
+            </div>
+
+            <div id="currencySettings" class="currency-settings" hidden>
+
+                <label for="currencyCost">
+                    Custo de cada giro
+                </label>
+
+                <input
+                    type="text"
+                    id="currencyCost"
+                    placeholder="Ex.: 500k, 1.5M, 10B..."
+                    inputmode="decimal"
+                    autocomplete="off"
+                >
+
+                <p class="hint">
+                    Aceita números e abreviações como K, M, B, T, Qa, Qn e Sx.
+                </p>
+
+                <p id="currencyError" class="currency-error" hidden>
+                    Digite um valor válido.
+                </p>
+
+            </div>
 
         </section>
 
@@ -76,6 +118,32 @@
             <div class="chart-container">
                 <canvas id="grafico"></canvas>
             </div>
+
+            <!-- ABAS DO GRÁFICO -->
+
+            <div id="chartModeSwitch" class="chart-mode-switch" hidden>
+
+                <button
+                    type="button"
+                    id="chartModeSpins"
+                    class="chart-mode-button active spins-mode"
+                >
+                    🎟️ Giros
+                </button>
+
+                <button
+                    type="button"
+                    id="chartModeCurrency"
+                    class="chart-mode-button currency-mode"
+                >
+                    💛 Currency
+                </button>
+
+            </div>
+
+            <!-- PROBABILIDADE MANUAL -->
+
+            <div id="chanceDisplay" class="chance-display" hidden></div>
 
         </section>
 
@@ -102,11 +170,13 @@
                         <tr>
                             <th>Probabilidade desejada</th>
                             <th>Giros necessários</th>
+                            <th id="currencyColumnHeader" hidden>
+                                💛 Currency
+                            </th>
                         </tr>
                     </thead>
 
-                    <tbody id="tabelaResultados">
-                    </tbody>
+                    <tbody id="tabelaResultados"></tbody>
 
                 </table>
 
